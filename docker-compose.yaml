@@ -1,0 +1,196 @@
+version: "3"
+x-extra_hosts:
+  # This is added so that within each service you can communicate to another service by using the DNS name of pi rather
+  # than using IP address. Makes it easy if the IP address changes. For example, when configuring Radarr, you can
+  # configure the transmission client url as http://pi:9091
+  &pi
+  # Change this to IP of your RPi
+  - "pi:192.168.4.4"
+services:
+  # All the services use docker bind mounts to store config data and media on the host's filesystem. If you familiar with
+  # docker storage, you can use whatever you want. You can change it to use docker volumes if you want.
+  # I have my external HDD mounted as /mnt/media. You can change it to your setup
+  #
+  # Nearly all the containers can be run as not root. This is controlled by PUID and PGID environment variables.
+  # Make sure any volume directories on the host are owned by the same user you specify to run the container as. Else
+  # you may have permissions issues
+  plex:
+    image: linuxserver/plex:latest
+    restart: always
+    container_name: plex
+    network_mode: host
+    extra_hosts: *pi
+    devices:
+      # This basically mounts the GPU device on the host to the container, needed for hardware transcoding.
+      # For a RPi this won't do anything as plex does not support transcoding on anything other than Intel quicksync.
+      # You can comment or delete this if you want. Leaving it as it is won't do any harm.
+      - "/dev/dri:/dev/dri"
+    environment:
+      # The container is run as the user with this PUID and PGID (user and group id).
+      - PUID=1001
+      - PGID=1001
+    volumes:
+      # Docker bind mounts are used to store config and media on the host's filesystem. Config for plex will be stored
+      # in /mnt/media/appdata/plex/config directory and any transcoding data is stored in a transcode directory
+      - /mnt/media/appdata/plex/config:/config
+      - /mnt/media/appdata/plex/transcode:/transcode
+      # Within plex, we are mounting the root of /mnt/media to /all_media directory. So within plex, when you look
+      # inside /all_media directory you would see the same file structure as /mnt/media on the host
+      - /mnt/media:/all_media
+
+  transmission-openvpn:
+    # This is the only image that is not multi-arch. If you have to run this image on different platform you would need
+    # to change the image.
+    # Uncomment this line if you are not using Raspberry Pi and then comment the other image line. More images can be
+    # found at https://hub.docker.com/r/haugene/transmission-openvpn/tags
+    # image: haugene/transmission-openvpn:latest
+    image: haugene/transmission-openvpn:latest-armhf
+    restart: always
+    container_name: transmission-openvpn
+    network_mode: host
+    extra_hosts: *pi
+    environment:
+      # The container is run as the user with this PUID and PGID (user and group id).
+      - PUID=1001
+      - PGID=1001
+      # To run this container, you would need an openvpn provider. I use IPVANISH and hence in here that is used as an
+      # example. Please look at the documentation to understand each of the config variables.
+      # Documentation: https://haugene.github.io/docker-transmission-openvpn/
+      - TRANSMISSION_WEB_UI=transmission-web-control
+      - OPENVPN_PASSWORD=openvpn_provider_password
+      - OPENVPN_USERNAME=openvpn_provider_username
+      - OPENVPN_OPTS=--inactive 3600 --ping 10 --ping-exit 60
+      - LOCAL_NETWORK=192.168.4.0/24
+      - OPENVPN_PROVIDER=IPVANISH
+      - CREATE_TUN_DEVICE=true
+      # Change these to which vpn endpoints you want to connect to. More info in documentation
+      - OPENVPN_CONFIG=ipvanish-UK-London-lon-a05,ipvanish-UK-London-lon-a33,ipvanish-UK-Manchester-man-c06,ipvanish-NL-Amsterdam-ams-a08
+      # Below are just some variable to configure transmission. Configure them to whatever is best for your setup
+      - TRANSMISSION_DOWNLOAD_QUEUE_SIZE=5
+      - TRANSMISSION_IDLE_SEEDING_LIMIT=30
+      - TRANSMISSION_IDLE_SEEDING_LIMIT_ENABLED=true
+      - TRANSMISSION_RATIO_LIMIT=2
+      - TRANSMISSION_RATIO_LIMIT_ENABLED=true
+      - TRANSMISSION_SEED_QUEUE_ENABLED=true
+      - TRANSMISSION_SEED_QUEUE_SIZE=50
+    cap_add:
+      - NET_ADMIN
+    volumes:
+      # Docker bind mounts used to mount host's filesystem within the container
+      # Transmission config will be stored in a transmission-openvpn directory
+      - /mnt/media/appdata/transmission-openvpn:/config
+      # All the media managed by transmission with be stored in /mnt/media/downloads directory on the host BUT the
+      # transmission will see that as /data directory
+      - /mnt/media/downloads:/data
+
+  jackett:
+    image: linuxserver/jackett:latest
+    restart: always
+    container_name: jackett
+    extra_hosts: *pi
+    ports:
+      - "9117:9117"
+    environment:
+      # The container is run as the user with this PUID and PGID (user and group id).
+      - PUID=1001
+      - PGID=1001
+      - TZ=Europe/London
+    volumes:
+      - /mnt/media/appdata/jackett:/config
+      - /mnt/media/downloads:/downloads
+
+  radarr:
+    image: linuxserver/radarr:latest
+    restart: always
+    container_name: radarr
+    extra_hosts: *pi
+    ports:
+      - "7878:7878"
+    environment:
+      # The container is run as the user with this PUID and PGID (user and group id).
+      - PUID=1001
+      - PGID=1001
+      - TZ=Europe/London
+    volumes:
+      # Radarr needs to know where the downloaded media is. This is told to radarr by transmission
+      - /mnt/media/downloads:/downloads
+      - /mnt/media/downloads:/data
+      # config directory
+      - /mnt/media/appdata/radarr:/config
+      # Movies imported by radarr are stored in /mnt/media/movies directory on the host. Radarr sees this directory
+      # as /movies. Within radarr make your root folder as /movies
+      - /mnt/media/movies:/movies
+
+  sonarr:
+    image: linuxserver/sonarr:latest
+    restart: always
+    container_name: sonarr
+    extra_hosts: *pi
+    ports:
+      - "8989:8989"
+    environment:
+      # The container is run as the user with this PUID and PGID (user and group id).
+      - PUID=1001
+      - PGID=1001
+      - TZ=Europe/London
+    volumes:
+      # sonarr needs to know where the downloaded media is. This is told to sonarr by transmission
+      - /mnt/media/downloads:/downloads
+      - /mnt/media/downloads:/data
+      # config directory
+      - /mnt/media/appdata/sonarr:/config
+      # TV shows imported by sonarr are stored in /mnt/media/tv_shows directory on the host. sonarr sees this directory
+      # as /tv. Within sonarr make your root folder as /tv
+      - /mnt/media/tv_shows:/tv
+
+  lidarr:
+    image: linuxserver/lidarr:latest
+    restart: always
+    container_name: lidarr
+    extra_hosts: *pi
+    ports:
+      - "8686:8686"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+    volumes:
+      - /mnt/media/downloads:/downloads
+      - /mnt/media/downloads:/data
+      - /mnt/media/appdata/lidarr:/config
+      - /mnt/media/music:/music
+
+  tautulli:
+    image: linuxserver/tautulli:latest
+    restart: always
+    container_name: tautulli
+    extra_hosts: *pi
+    ports:
+      - "8181:8181"
+    environment:
+      - PUID=1001
+      - PGID=1001
+      - TZ=Europe/London
+    volumes:
+      - /mnt/media/appdata/tautulli:/config
+      - /mnt/media/appdata/plex/config/Library/Application Support/Plex Media Server/Logs:/logs
+
+  sonarr_netimport:
+    image: thundermagic/sonarr_netimport:latest
+    restart: always
+    container_name: sonarr_netimport
+    extra_hosts: *pi
+    environment:
+      - TVDB_USERNAME=first.lastb1q
+      - TVDB_USER_KEY=user_key
+      - TVDB_API_KEY=tvdb_api_key
+      - SONARR_IP=192.168.4.4
+      - SONARR_PORT=8989
+      - SONARR_API_KEY=sonarr_api_key
+      - SYNC_INTERVAL=3600  # Interval at which to sync with TVDB, in seconds
+      # Below variables are for sending error notification emails. If not needed, delete these
+      - EMAIL_ADDRESS=first.last@gmail.com
+      - EMAIL_TO_ADDRESS=first.last@gmail.com
+      - EMAIL_PASSWORD=email_password
+      - SMTP_SERVER=smtp.gmail.com
+      - SMTP_SERVER_PORT=587
