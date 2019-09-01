@@ -48,7 +48,7 @@ Please check out: https://github.com/thundermagic/rpi_monitoring_with_prometheus
 - docker
 - docker-compose
 
-Follow this guide if you have to install docker and docker-compose: https://github.com/thundermagic/media_server/blob/master/docs/docker_install.md
+Follow this guide if you have to install docker and docker-compose: https://github.com/thundermagic/rpi_media_centre/blob/master/docs/docker_install.md
 
 ## Quick start
 Ok lets start to run the media server
