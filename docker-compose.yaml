@@ -151,13 +151,18 @@ services:
     ports:
       - "8686:8686"
     environment:
+      # The container is run as the user with this PUID and PGID (user and group id).
       - PUID=1000
       - PGID=1000
       - TZ=Europe/London
     volumes:
+      # lidarr needs to know where the downloaded media is. This is told to lidarr by transmission
       - /mnt/media/downloads:/downloads
       - /mnt/media/downloads:/data
+      # config directory
       - /mnt/media/appdata/lidarr:/config
+      # Music imported by lidarr is stored in /mnt/media/music directory on the host. lidarr sees this directory
+      # as /music. Within lidarr make your root folder as /music
       - /mnt/media/music:/music
 
   tautulli:
@@ -168,13 +173,25 @@ services:
     ports:
       - "8181:8181"
     environment:
+      # The container is run as the user with this PUID and PGID (user and group id).
       - PUID=1001
       - PGID=1001
       - TZ=Europe/London
     volumes:
+      # config directory
       - /mnt/media/appdata/tautulli:/config
+      # Tautulli needs access to plex logs. In the plex container we mounted /mnt/media/appdata/plex of the host as the
+      # config directory for plex. Logs are located within this config directory
       - /mnt/media/appdata/plex/config/Library/Application Support/Plex Media Server/Logs:/logs
 
+  # Sonarr at present does not support netimport lists like Radarr does. On Radarr you can setup it up to import movies
+  # from Lists like IMDB lists or themoviedb.org lists. Using these lists, you can just add the movies you want to
+  # these lists and radarr will sync up with these lists and then start downloading and managing the movies.
+  # Similar thing is not available for sonarr. So this service can sync the TV shows from TVDB.com list and add them
+  # to sonarr. So basically you create an account on TVDB.com and then you would get a username and you can create an
+  # API KEY. You would need these to use this container. Once this service is setup, any TV shows that you add to your
+  # favourites list will be fetched at the SYNC_INTERVAL and added to sonarr. Sonarr then would start downloading and
+  # managing this TV show
   sonarr_netimport:
     image: thundermagic/sonarr_netimport:latest
     restart: always
