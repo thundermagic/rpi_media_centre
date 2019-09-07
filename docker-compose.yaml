@@ -7,13 +7,24 @@ x-extra_hosts:
   # Change this to IP of your RPi
   - "pi:192.168.4.4"
 services:
-  # All the services use docker bind mounts to store config data and media on the host's filesystem. If you familiar with
+  # All the services use docker bind mounts to store config data and media on the host's filesystem. If you're familiar with
   # docker storage, you can use whatever you want. You can change it to use docker volumes if you want.
-  # I have my external HDD mounted as /mnt/media. You can change it to your setup
+  # I have my external HDD mounted as /mnt/media. Hence all the bind mounts use /mnt/media as the root. If you want
+  # to use a different directory for bind mount, you can do that by modifying the bind mounts under volumes section of
+  # a service
   #
-  # Nearly all the containers can be run as not root. This is controlled by PUID and PGID environment variables.
+  # Nearly all the containers can be run as non root. This is controlled by PUID and PGID environment variables.
   # Make sure any volume directories on the host are owned by the same user you specify to run the container as. Else
   # you may have permissions issues
+  #
+  # If you dont want any service, you can delete that section. Alternatively if you want to use another service or
+  # add more services, you can add/change them in this docker-compose file.
+  # For example: if you want to use Emby instead of Plex, you can change the plex service to emby. Linuxserver.io
+  # provide most of the docker images that you would need. They provide a docker image for emby as well.
+  #
+  # Each services runs on a different port number. Plex and transmission-openvpn uses host networking mode whereas all
+  # the other services use docker bridge networking and have host ports mapped to container ports. For these you can
+  # change the mapping between host ports and container ports. Port mapping is in the format <host_port>:<container_port>
   plex:
     image: linuxserver/plex:latest
     restart: always
@@ -40,7 +51,7 @@ services:
 
   transmission-openvpn:
     # This is the only image that is not multi-arch. If you have to run this image on different platform you would need
-    # to change the image.
+    # to change the image tag.
     # Uncomment this line if you are not using Raspberry Pi and then comment the other image line. More images can be
     # found at https://hub.docker.com/r/haugene/transmission-openvpn/tags
     # image: haugene/transmission-openvpn:latest
@@ -89,6 +100,7 @@ services:
     container_name: jackett
     extra_hosts: *pi
     ports:
+      # Host port 9117 is mapped to container port 9117
       - "9117:9117"
     environment:
       # The container is run as the user with this PUID and PGID (user and group id).
@@ -105,6 +117,7 @@ services:
     container_name: radarr
     extra_hosts: *pi
     ports:
+      # Host port 7878 is mapped to container port 7878
       - "7878:7878"
     environment:
       # The container is run as the user with this PUID and PGID (user and group id).
@@ -127,6 +140,7 @@ services:
     container_name: sonarr
     extra_hosts: *pi
     ports:
+      # Host port 8989 is mapped to container port 8989
       - "8989:8989"
     environment:
       # The container is run as the user with this PUID and PGID (user and group id).
@@ -149,6 +163,7 @@ services:
     container_name: lidarr
     extra_hosts: *pi
     ports:
+      # Host port 8686 is mapped to container port 8686
       - "8686:8686"
     environment:
       # The container is run as the user with this PUID and PGID (user and group id).
@@ -171,6 +186,7 @@ services:
     container_name: tautulli
     extra_hosts: *pi
     ports:
+      # Host port 8181 is mapped to container port 8181
       - "8181:8181"
     environment:
       # The container is run as the user with this PUID and PGID (user and group id).
@@ -189,7 +205,7 @@ services:
   # these lists and radarr will sync up with these lists and then start downloading and managing the movies.
   # Similar thing is not available for sonarr. So this service can sync the TV shows from TVDB.com list and add them
   # to sonarr. So basically you create an account on TVDB.com and then you would get a username and you can create an
-  # API KEY. You would need these to use this container. Once this service is setup, any TV shows that you add to your
+  # API KEY. You would need these to use this service. Once this service is setup, any TV shows that you add to your
   # favourites list will be fetched at the SYNC_INTERVAL and added to sonarr. Sonarr then would start downloading and
   # managing this TV show
   sonarr_netimport:
@@ -201,13 +217,14 @@ services:
       - TVDB_USERNAME=first.lastb1q
       - TVDB_USER_KEY=user_key
       - TVDB_API_KEY=tvdb_api_key
+      # IP address and port number where sonarr can be accessed
       - SONARR_IP=192.168.4.4
       - SONARR_PORT=8989
       - SONARR_API_KEY=sonarr_api_key
       - SYNC_INTERVAL=3600  # Interval at which to sync with TVDB, in seconds
       # Below variables are for sending error notification emails. If not needed, delete these
       - EMAIL_ADDRESS=first.last@gmail.com
-      - EMAIL_TO_ADDRESS=first.last@gmail.com
       - EMAIL_PASSWORD=email_password
+      - EMAIL_TO_ADDRESS=first.last@gmail.com
       - SMTP_SERVER=smtp.gmail.com
       - SMTP_SERVER_PORT=587
