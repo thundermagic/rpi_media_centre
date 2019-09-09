@@ -137,7 +137,6 @@ Check out videos from [Techno Dad Life youtube channel](https://www.youtube.com/
 These videos show you how to install and configure the service on openmediavault but you can just skip straight to the configuration part.
 
 ## Services details
-### Media centre services
 #### Plex
 This is the main media server.  
 Website: www.plex.tv  
@@ -230,6 +229,6 @@ docker container rm srv1
 docker-compose up -d srv1
 ```
                                                                                                                                                                   
-## Do you want to monitor RPi as well?                                           
-Please check out: https://github.com/thundermagic/rpi_monitoring_with_prometheus 
+## Do you want to monitor RPi as well?   
+Check out: [Monitoring Raspberry Pi with Prometheus](https://github.com/thundermagic/rpi_monitoring_with_prometheus)                                         
 
