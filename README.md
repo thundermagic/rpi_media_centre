@@ -18,14 +18,16 @@ the release for delivery time). Before that I was using a Raspberry Pi 3B+ and t
 RPi can direct play few video streams simultaneously without any issue, assuming your home network is good enough. Wired 
 connectivity between clients and the media server would help.  
 
-My home setup is all on one RPi 4 (overclocked to 1850 MHz). For storage I have two HDD connected to the Pi and they are in RAID 1. I am using linux
+My home setup is all on one RPi 4 (overclocked to 2 GHz). For storage I have two HDD connected to the Pi and they are in RAID 1. I am using linux
 software raid (mdadm). I am also running monitoring stuff on the same Pi (prometheus, grafana etc etc). There has been no performance
 issues with the Raspberry Pi. I have amazon firestick 4K as video clients connected to TVs. This can play most of the video content. 
 And if there is any content that requires transcoding to play, then I just get the format that would direct play on firestick. 
 If I am managing video content then I can control which video formats I get. This is quite easy to do using services like 
 radarr/sonarr/lidarr. You can exclude video/audio formats that you don't want.
 
-You would need active cooling for RPi 4. It gets HOT!
+You would need active cooling for RPi 4. It gets HOT! I use [40mm heatsink](https://www.amazon.co.uk/Easycargo-conductive-TEC1-12706-Thermoelectric-40mmx40mmx11mm/dp/B07D4FVC61/ref=sr_1_1?crid=30Z05ERNBH3F7&keywords=40mm+heatsink&qid=1568560208&s=gateway&sprefix=40mm+heat%2Caps%2C259&sr=8-1) 
+with [noctua 5v fan](https://www.amazon.co.uk/Noctua-NF-A4x20-FLX-Premium-40x20mm/dp/B071J8CZP9/ref=sr_1_3_sspa?keywords=noctua+5v&qid=1568560244&s=gateway&sr=8-3-spons&psc=1&spLa=ZW5jcnlwdGVkUXVhbGlmaWVyPUFLUUNSTkU0Vk1DRUYmZW5jcnlwdGVkSWQ9QTEwMTc3MDUxVUtEOVMwQ0FFQlFFJmVuY3J5cHRlZEFkSWQ9QTA2OTY4MjExVEs2N1lVSE00Q0hXJndpZGdldE5hbWU9c3BfYXRmJmFjdGlvbj1jbGlja1JlZGlyZWN0JmRvTm90TG9nQ2xpY2s9dHJ1ZQ==)
+ and this keeps RPi quite cool even under full load.
 
 Yes, if you want to transcode video and want to serve content over the WAN to friends and family, then you would need something
 more powerful. You can still use this guide, it would work regardless if you are using a RPi or something else.
