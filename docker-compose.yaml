@@ -11,11 +11,11 @@ services:
   # docker storage, you can use whatever you want. You can change it to use docker volumes if you want.
   # I have my external HDD mounted as /mnt/media. Hence all the bind mounts use /mnt/media as the root. If you want
   # to use a different directory for bind mount, you can do that by modifying the bind mounts under volumes section of
-  # a service
+  # a service.
   #
   # Nearly all the containers can be run as non root. This is controlled by PUID and PGID environment variables.
   # Make sure any volume directories on the host are owned by the same user you specify to run the container as. Else
-  # you may have permissions issues
+  # you may have permissions issues.
   #
   # If you dont want any service, you can delete that section. Alternatively if you want to use another service or
   # add more services, you can add/change them in this docker-compose file.

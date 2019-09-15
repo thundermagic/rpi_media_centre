@@ -42,7 +42,11 @@ more powerful. You can still use this guide, it would work regardless if you are
 - sonarr_netimport: A python script to fetch TV shows from tvdb.com and add them to sonarr
 
 Note: transmission and openvpn are in one container.  
-*You can change this with other media server like Emby. See `docker-compose.yaml` file for details
+*You can change this with other media server like Emby. See `docker-compose.yaml` file for details.  
+
+If you don't want to use a specific service or use something different in its place, you can delete/change that service
+in the `docker-compose.yaml` file. Most of the services that you would need for media centre have docker containers 
+built by [linuxserver.io](https://www.linuxserver.io/)
 
 ## Prerequisite 
 - docker
