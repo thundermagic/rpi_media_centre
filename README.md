@@ -1,5 +1,5 @@
 # Media Centre on Raspberry Pi
-This is a bundle of different docker containers to run a media centre with additional services. This would let you playback and manage media. 
+This is a bundle of different docker containers to run a media centre. This would let you playback and manage media. 
 
 **DISCLAIMER: NOT ALL THE SERVICES ARE CREATED BY ME. I HAVE JUST PUT THEM TOGETHER.**
 
@@ -105,7 +105,7 @@ docker container ls -a
 All the containers should show as running. If there is any container stuck in a reboot a cycle, check the directory 
 structure created in previous steps and check container logs for more info.
 
-##### How to check container logs?
+##### How do I check container logs?
 ```bash
 docker container logs <container_name>
 ```
