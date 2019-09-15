@@ -17,8 +17,8 @@ services:
   # Make sure any volume directories on the host are owned by the same user you specify to run the container as. Else
   # you may have permissions issues.
   #
-  # If you dont want any service, you can delete that section. Alternatively if you want to use another service or
-  # add more services, you can add/change them in this docker-compose file.
+  # If you dont want any service, you can delete that section. Alternatively, if you want to use another service or
+  # add more services, you can add/change them in this file.
   # For example: if you want to use Emby instead of Plex, you can change the plex service to emby. Linuxserver.io
   # provide most of the docker images that you would need. They provide a docker image for emby as well.
   #
@@ -220,6 +220,7 @@ services:
       # IP address and port number where sonarr can be accessed
       - SONARR_IP=192.168.4.4
       - SONARR_PORT=8989
+      # Sonarr app API key. This is on sonarr under settings>general
       - SONARR_API_KEY=sonarr_api_key
       - SYNC_INTERVAL=3600  # Interval at which to sync with TVDB, in seconds
       # Below variables are for sending error notification emails. If not needed, delete these
