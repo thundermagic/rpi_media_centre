@@ -223,6 +223,10 @@ services:
       # Sonarr app API key. This is on sonarr under settings>general
       - SONARR_API_KEY=sonarr_api_key
       - SYNC_INTERVAL=3600  # Interval at which to sync with TVDB, in seconds
+      - SEARCH_MISSING_EPISODES=1  # 1 is True
+      - QUALITY_PROFILE_ID=1  # 1 is profile any
+      - MONITORED=1  # 1 is True
+      - ROOT_FOLDER_PATH=/tv/  # Full path of root folder
       # Below variables are for sending error notification emails. If not needed, delete these
       - EMAIL_ADDRESS=first.last@gmail.com
       - EMAIL_PASSWORD=email_password
