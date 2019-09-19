@@ -31,9 +31,11 @@ services:
     container_name: plex
     network_mode: host
     extra_hosts: *pi
+    # NOTE: Please delete this entire `devices` section if your device does not have /dev/dri device. If you using something
+    # like RPi3, you would need to delete this section else you will get an error when trying to run this container.
     devices:
       # This basically mounts the GPU device on the host to the container, needed for hardware transcoding.
-      # For a RPi this won't do anything as plex does not support transcoding on anything other than Intel quicksync.
+      # For a RPi 4 this won't do anything as plex does not support transcoding on anything other than Intel quicksync.
       # You can comment or delete this if you want. Leaving it as it is won't do any harm.
       - "/dev/dri:/dev/dri"
     environment:

@@ -57,7 +57,8 @@ You need python 3 to install docker-compose.
 
 Not sure if you already have python 3?
 Just type on the console, `python3` and if you are put in the python console then you have python3 installed, if not
- follow steps to install python3
+ follow steps to install python3. You may `python3` installed but not `python3-pip`. In that case just installed `python3-pip`,
+ command `sudo apt install python3-pip`
  
 ##### Install python 3 and python 3 pip
 ```bash

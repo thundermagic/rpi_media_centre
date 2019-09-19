@@ -4,7 +4,8 @@ This is a bundle of different docker containers to run a media centre. This woul
 **DISCLAIMER: NOT ALL THE SERVICES ARE CREATED BY ME. I HAVE JUST PUT THEM TOGETHER.**
 
 Since this uses docker containers, it can be run on `amd64` platforms as well (i.e your windows or linux machine). 
-This guide is generic, any platform specific changes would be highlighted with comments.
+This guide is generic, any platform specific changes would be highlighted with comments. This guide uses commands for `debian` and 
+debian based systems (like `raspbian`). If you are using a different distro, please use the relevant commands. 
 
 ## Isn't Raspberry Pi under powered to run a media centre?
 Raspberry Pi 4 actually makes a good low powered platform to run a home media centre system. It can't really handle video 
@@ -124,6 +125,15 @@ docker container logs -f plex
 Assuming everything went alright, you should have all the servics running now.  
 You can now access each of the services.
 
+#### How to check if Openvpn is working?
+You would need to check two things, if the tunnel interface is created and if the vpn is up and passing traffic.
+
+For the first one, tunnel interface, on the host, check if there is a `tun` interface created when transmission-openvpn container is running. 
+
+To check if VPN is up and passing traffic, on the host, just check your public IP by googling `whatsmyip`. If you are using the host headless, then type
+`curl www.httpbin.org/get` on the console and check the IP address in the `origin` field in the output. That is the public IP being used my the host. 
+Now if you check the Public IP being used by your network, that should be different from what you got from the previous step.
+
 ## Accessing services
 Each service have a different port number. Assuming your RPi IP address is 192.168.4.4 and you haven't change the port 
 numbers in `docker-compose.yaml` file, you can access the service like;
@@ -238,3 +248,38 @@ docker-compose up -d srv1
 ## Do you want to monitor RPi as well?   
 Check out: [Monitoring Raspberry Pi with Prometheus](https://github.com/thundermagic/rpi_monitoring_with_prometheus)                                         
 
+## Some common issues
+
+These are some of the issues I can think off from top of my mind that you may encounter and how to resolve them
+
+1) **`Operation not permitted` or similar errors:** If you get these errors then the issue usually lies with either 
+the user who is trying to run docker container is not a memeber of `docker` group or the user is trying to create some 
+files/folder and do not have the required permissions to do so.
+To resolve these, make sure the user is a member of the `docker` group. You can check this from the `/etc/group` file. 
+To make a user member of docker group, type `sudo usermod -aG docker $USER` assuming you are logged in as that user. Else 
+replace the `$USER` in this command with the username of the user.
+
+2) **`Operation not supported` or `port number already used` errors:** You may get these sort of errors if something is already using
+port numbers on your host that are specified for the services in the `docker-compose.yaml` file. In that case, you can change the port mappings 
+for that service in the `docker-compose.yaml` file.
+
+3) **`Device not found` or similar when running Plex container:** This error is due to the device mapping in the `docker-compose.yaml` file.
+You would most likely encounter this issue if using RPi3. Please check the `docker-compose.yaml` and delete the `devices` section 
+for plex.
+
+4) **`docker-compose not found`:** You may encounter this issue after installing docker-compose because sometimes after the 
+installation, the docker-compose binary is not copied to one of the paths in the $PATHS. i.e. After installation it would 
+most likely be in the `$HOME/.local/bin` directory. Copy the docker-compose from here to `/usr/local/bin` directory. 
+Command: `cp docker-compose /usr/local/bin`.
+
+5) **`x-extra_args not supported` or `docker-compose version is wrong` errors:** If you get errors like this, then its an issue with
+the docker-compose version. To resolve it, first change the version in the `docker-compose.yaml` file to `3.7`. If that does not
+work then change it to `2`. If still it does not work, then delete the entire `x-extra_args` section and within each service definition
+change the section `extra_hosts: *pi` to `extra_hosts: "pi:<HOST-IP>"` where `HOST-IP` is the IP address of the host that you are running
+the services on. This just adds an entry to the `hosts` file within the container so you can use the DNS name of `pi` rather than using
+ip address to connect to other services. If you are not bothered about it then you can delete this section from the container 
+definition. 
+
+## Future iterations
+I am planning to run all of this on a cluster of RPis with some shared storage solution. This is something I will be working on in my
+free time. Probably would run kubernetes + ceph or nfs. Haven't really thought much about it. 
