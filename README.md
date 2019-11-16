@@ -43,6 +43,7 @@ more powerful. You can still use this guide, it would work regardless if you are
 - Tautulli: Plex media server monitoring service
 - Jackett: Torrent indexers proxy
 - sonarr_netimport: A python script to fetch TV shows from tvdb.com and add them to sonarr
+- radarr_netimport: Similar to sonarr_netimport but for radarr
 
 Note: transmission and openvpn are in one container.  
 *You can change this with other media server like Emby. See `docker-compose.yaml` file for details.  
@@ -205,6 +206,12 @@ support netimport lists.
 Website: https://github.com/thundermagic/sonarr_netimport  
 Docker image and documentation: https://hub.docker.com/r/thundermagic/sonarr_netimport
 
+#### radarr_netimport
+Similar to sonarr_netimport but for radarr. Radarr has this feature built-in but radarr uses TMDB API v3 and 
+I have noticed that if using v3 API, TMDB only returns maximum of 500 movies in the list. 
+This is resolved if using TMDB API v4.
+Website: https://github.com/thundermagic/radarr_netimport
+Docker image and documentation: https://hub.docker.com/r/thundermagic/radarr_netimport
 
 ## How to upgrade a service?
 When there is a new version of service available, like a newer plex version, you can follow these steps to upgrade

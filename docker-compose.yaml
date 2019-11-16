@@ -235,3 +235,23 @@ services:
       - EMAIL_TO_ADDRESS=first.last@gmail.com
       - SMTP_SERVER=smtp.gmail.com
       - SMTP_SERVER_PORT=587
+
+  # Similar to sonarr_netimport but for radarr. Radarr has this feature built-in but radarr uses TMDB API v3 and
+  # I have noticed that if using v3 API, TMDB only returns maximum of 500 movies in the list.
+  # This is resolved if using TMDB API v4.
+  radarr_netimport:
+    image: thundermagic/radarr_netimport:latest
+    restart: on-failure
+    container_name: radarr_netimport
+    environment:
+      - TMDB_ACCESS_TOKEN=sampletoken
+      - TMDB_API_KEY=tvdb_api_key
+      - TMDB_LIST_ID=12345
+      # IP address and port number where radarr can be accessed
+      - RADARR_IP=192.168.4.4
+      - RADARR_PORT=7878
+      # radarr API key. This is on radarr under settings>general
+      - RADARR_API_KEY=radarr_api_key
+      - SYNC_INTERVAL=3600  # Interval at which to sync with TMDB, in seconds
+      - QUALITY_PROFILE_ID=1  # 1 is profile any
+      - ROOT_FOLDER_PATH=/movies/  # Full path of root folder
