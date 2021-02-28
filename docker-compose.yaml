@@ -52,12 +52,7 @@ services:
       - /mnt/media:/all_media
 
   transmission-openvpn:
-    # This is the only image that is not multi-arch. If you have to run this image on different platform you would need
-    # to change the image tag.
-    # Uncomment this line if you are not using Raspberry Pi and then comment the other image line. More images can be
-    # found at https://hub.docker.com/r/haugene/transmission-openvpn/tags
-    # image: haugene/transmission-openvpn:latest
-    image: haugene/transmission-openvpn:latest-armhf
+    image: haugene/transmission-openvpn:latest
     restart: always
     container_name: transmission-openvpn
     network_mode: host
