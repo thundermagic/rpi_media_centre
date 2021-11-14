@@ -62,22 +62,23 @@ Just type on the console, `python3` and if you are put in the python console the
  
 ##### Install python 3 and python 3 pip
 ```bash
-$ sudo apt install python3 && sudo apt install python3-pip
+$ sudo apt-get install -y libffi-dev libssl-dev
+$ sudo apt-get install -y python3 python3-pip
 ```
 
 ##### Install docker-compose
 ```bash
-$ python3 -m pip install docker-compose
+$ sudo pip3 -v install docker-compose
 ```
 
 After installation, check if docker-compose is installed correctly. Type `docker-compose version` and you should get a response
 like this
 ```bash
 $ docker-compose version
-docker-compose version 1.24.1, build 4667896
-docker-py version: 3.7.3
+docker-compose version 1.29.2, build unknown
+docker-py version: 5.0.3
 CPython version: 3.7.3
-OpenSSL version: OpenSSL 1.1.1c  28 May 2019
+OpenSSL version: OpenSSL 1.1.1d  10 Sep 2019
 ```
 
 ##### Got error while docker or docker-compose installation?
